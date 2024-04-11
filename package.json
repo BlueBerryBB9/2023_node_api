@@ -1,17 +1,27 @@
 {
-  "name": "2023_node_lab_1",
-  "packageManager": "yarn@4.1.1",
-  "type": "module",
-  "dependencies": {
-    "lolcatjs": "^2.4.3"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.12.7",
-    "eslint": "^9.0.0",
-    "prettier": "3.2.5",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.6.0"
-  }
+    "name": "2023_node_lab_1",
+    "packageManager": "yarn@4.1.1",
+    "type": "module",
+    "dependencies": {
+        "lolcatjs": "^2.4.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.0.0",
+        "@tsconfig/node20": "^20.1.4",
+        "@types/node": "^20.12.7",
+        "eslint": "^9.0.0",
+        "prettier": "3.2.5",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^7.6.0"
+    },
+    "scripts": {
+        "hey": "echo hello world",
+        "start": "node dist/",
+        "compile": "tsc",
+        "exe": "yarn compile;yarn start",
+        "static": "eslint src/",
+        "style": "prettier --check",
+        "wstyle": "prettier --write",
+        "supsrc": "rm dist/*"
+    }
 }

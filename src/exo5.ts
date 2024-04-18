@@ -6,7 +6,12 @@ export type TimeSlot = {
     login?: string;
 };
 
-export function mk_slots(params: { date: Date; inc: number; slot_nb: number }) {
+export function mk_slots(params: {
+    date: Date;
+    inc: number;
+    slot_nb: number;
+    space?: number;
+}) {
     let i = 0;
     let slots_array: TimeSlot[] = [];
 

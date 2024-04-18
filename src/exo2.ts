@@ -1,11 +1,12 @@
 export type User = {
+    name: string;
     id: number;
     login: string;
     yob: number;
 };
 
-export function users_add(x: User[], login: string, yob: number) {
-    x.push({ id: x.length, login, yob });
+export function users_add(x: User[], login: string, yob: number, name: string) {
+    x.push({ id: x.length, login, yob, name });
 }
 
 // export function users_get(x: User[], index: string | number) {
@@ -24,11 +25,12 @@ export function users_get(
     index: { login: string } | { id: number },
 ) {
     if ("login" in index) {
-        var res = users.find((elem) => elem["login"] === index.login);
+        let res = users.find((elem) => elem["login"] === index.login);
+        return res === undefined ? null : res;
     } else if ("id" in index) {
-        var res = users.find((elem) => elem["id"] === index.id);
+        let res = users.find((elem) => elem["id"] === index.id);
+        return res === undefined ? null : res;
     }
-    return res === undefined ? null : res;
 }
 
 export function users_logins(users: User[]) {
@@ -40,6 +42,6 @@ export function users_logins(users: User[]) {
 export function users_name_by_birth_year(users: User[]) {
     let another = users.slice().sort((a, b) => a.yob - b.yob);
     return another.map((user) => {
-        return { login: user.login, yob: user.yob };
+        return { name: user.name, yob: user.yob };
     });
 }

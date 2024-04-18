@@ -7,6 +7,8 @@ export function toto_narrow(x: string | number | string[] | number[]) {
         return x + " bonjour!";
     } else if (typeof x === "number") {
         return x + 12;
+    } else if (!x.length) {
+        return null;
     } else if (is_str_array(x)) {
         x.push("je suis une chaîne supplémentaire");
         return null;

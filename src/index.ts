@@ -54,9 +54,9 @@ console.log(gg2);
 
 let user_array: User[] = [];
 
-users_add(user_array, "Martin", 2004);
-users_add(user_array, "Noah", 2005);
-users_add(user_array, "Vitor", 2003);
+users_add(user_array, "martin.leroy", 2004, "Martin Leroy");
+users_add(user_array, "noah.chantin", 2005, "Noah Chantin");
+users_add(user_array, "victor.vandeputte", 2003, "Victor Vandeputte");
 
 console.log(users_get(user_array, { login: "Martin" }));
 console.log(users_get(user_array, { id: 1 }));

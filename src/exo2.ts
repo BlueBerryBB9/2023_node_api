@@ -24,13 +24,13 @@ export function users_get(
     users: User[],
     index: { login: string } | { id: number },
 ) {
-    if ("login" in index) {
-        let res = users.find((elem) => elem["login"] === index.login);
-        return res === undefined ? null : res;
-    } else if ("id" in index) {
-        let res = users.find((elem) => elem["id"] === index.id);
-        return res === undefined ? null : res;
-    }
+    let res;
+
+    if ("login" in index)
+        res = users.find((elem) => elem["login"] === index.login);
+    else if ("id" in index) res = users.find((elem) => elem["id"] === index.id);
+
+    return res === undefined ? null : res;
 }
 
 export function users_logins(users: User[]) {

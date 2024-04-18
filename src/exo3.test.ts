@@ -1,9 +1,9 @@
-export function mk_login(login: string) {
-    login = login.toLowerCase();
-    login = login.trim();
-    login = login.replace(" ", ".");
-    login = login.replaceAll(" ", "");
-    login = login.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+import { describe, expect, test } from "@jest/globals";
+import { mk_login } from "./exo3.js";
 
-    return login;
-}
+describe("exo3 module", () => {
+    test("mk_login", () => {
+        expect(mk_login("Élise Philippe")).toBe("elise.philippe");
+        expect(mk_login(" ÉlIsE     PHilIppe  ")).toBe("elise.philippe");
+    });
+});

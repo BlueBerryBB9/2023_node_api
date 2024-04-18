@@ -1,6 +1,13 @@
 // imports
 import { toto_narrow } from "./exo1.js";
-import { User, users_add, users_get } from "./exo2.js";
+import {
+    User,
+    users_add,
+    users_get,
+    users_logins,
+    users_name_by_birth_year,
+} from "./exo2.js";
+import { mk_login } from "./exo3.js";
 
 // intro
 
@@ -48,6 +55,15 @@ console.log(gg2);
 let user_array: User[] = [];
 
 users_add(user_array, "Martin", 2004);
-users_get(user_array, "Martin");
+users_add(user_array, "Noah", 2005);
+users_add(user_array, "Vitor", 2003);
 
-console.log(user_array);
+console.log(users_get(user_array, { login: "Martin" }));
+console.log(users_get(user_array, { id: 1 }));
+console.log(users_logins(user_array));
+console.log(users_name_by_birth_year(user_array));
+
+// exo 3
+
+console.log(mk_login("Élise Philippe"));
+console.log(mk_login(" ÉlIsE     PHilIppe  "));

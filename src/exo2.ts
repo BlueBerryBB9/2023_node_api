@@ -38,7 +38,8 @@ export function users_logins(users: User[]) {
 }
 
 export function users_name_by_birth_year(users: User[]) {
-    let another: User[] = JSON.parse(JSON.stringify(users));
-    another.sort((a, b) => a.yob - b.yob);
-    return another;
+    let another = users.slice().sort((a, b) => a.yob - b.yob);
+    return another.map((user) => {
+        return { login: user.login, yob: user.yob };
+    });
 }

@@ -28,6 +28,7 @@
         "style": "prettier --check src",
         "wstyle": "prettier --write src",
         "supsrc": "rm dist/*",
-        "dev": "nodemon"
+        "dev": "nodemon",
+        "tester": "jest src --watch"
     }
 }

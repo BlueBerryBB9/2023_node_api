@@ -23,12 +23,16 @@ export function mk_slots(params: {
     let mod = 0;
     let slots_array: TimeSlot[] = [];
     let new_date: Date = new Date(params.date);
-    if (params.space === undefined) params.space = 0;
-    if (params.pause_rate === undefined) params.pause_rate = 0;
-    if (params.pause_time === undefined) params.pause_time = 0;
+
     for (let i = 0; i < params.slot_nb; i++) {
-        if (i % params.pause_rate === 0 && i !== 0) mod = params.pause_time;
-        else if (params.space > 0 && i !== 0) mod = params.space;
+        if (
+            params.pause_rate &&
+            params.pause_time &&
+            i % params.pause_rate === 0 &&
+            i !== 0
+        )
+            mod = params.pause_time;
+        else if (params.space && i !== 0) mod = params.space;
         new_date = mk_date_inc(new_date, params.inc + mod);
         slots_array.push({
             bgn_date: mk_date_inc(new_date, -params.inc),

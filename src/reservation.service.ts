@@ -59,35 +59,35 @@ export class ReservationService implements IReservationService {
         return rtrn;
     }
     getAllSlotBySpanId(id: number): Slot[] {
-        return this.slots.filter((el) => el.id === id);
+        return this.slots.filter((el) => el.idSpan === id);
     }
     deleteSpanById(id: number): void {
-        if (this.spans === this.spans.filter((el) => el.id !== id))
+        if (!this.spans.find((el) => el.id === id))
             throw new ReservationServiceErr("Span", "NotFound");
         this.spans = this.spans.filter((el) => el.id !== id);
         this.slots = this.slots.filter((el) => el.idSpan !== id);
     }
     deleteSlotById(id: number): void {
-        if (this.slots === this.slots.filter((el) => el.id !== id))
+        if (!this.slots.find((el) => el.id === id))
             throw new ReservationServiceErr("Slot", "NotFound");
         this.slots = this.slots.filter((el) => el.id !== id);
     }
     updateSpanById(id: number, maj: Span): void {
+        if (!this.spans.find((el) => el.id === id))
+            throw new ReservationServiceErr("Span", "NotFound");
         maj.id = id;
-        let span = this.spans.find((el) => el.id === maj.id);
-        if (!span) throw new ReservationServiceErr("Span", "NotFound");
-        span = maj;
+        this.spans[this.spans.findIndex((el) => el.id === id)] = maj;
     }
     updateSlotById(id: number, maj: Slot): void {
+        if (!this.slots.find((el) => el.id === id))
+            throw new ReservationServiceErr("Slot", "NotFound");
         maj.id = id;
-        let slot = this.slots.find((el) => el.id === maj.id);
-        if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
-        slot = maj;
+        this.slots[this.slots.findIndex((el) => el.id === id)] = maj;
     }
 }
 
 export class ReservationServiceErr {
     constructor(subject: "Span" | "Slot", msg: "NotFound") {
-        console.error(subject + " : " + msg);
+        console.log(subject + " : " + msg);
     }
 }

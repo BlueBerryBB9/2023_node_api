@@ -20,9 +20,9 @@ export interface IReservationService {
 
     addSpan(span: Span): Span;
     addSlot(slot: Slot): Slot;
-    getSpanById(id: number): Span | undefined;
-    getSlotById(id: number): Slot | undefined;
-    getAllSlotBySpanId(id: number): Slot[] | undefined;
+    getSpanById(id: number): Span;
+    getSlotById(id: number): Slot;
+    getAllSlotBySpanId(id: number): Slot[];
     deleteSpanById(id: number): void;
     deleteSlotById(id: number): void;
     updateSpanById(id: number, maj: Span): void;
@@ -48,30 +48,46 @@ export class ReservationService implements IReservationService {
         this.slots.push(slot);
         return slot;
     }
-    getSpanById(id: number): Span | undefined {
-        return this.spans.find((el) => el.id === id);
+    getSpanById(id: number): Span {
+        let rtrn = this.spans.find((el) => el.id === id);
+        if (!rtrn) throw new ReservationServiceErr("Span", "NotFound");
+        return rtrn;
     }
-    getSlotById(id: number): Slot | undefined {
-        return this.slots.find((el) => el.id === id);
+    getSlotById(id: number): Slot {
+        let rtrn = this.slots.find((el) => el.id === id);
+        if (!rtrn) throw new ReservationServiceErr("Slot", "NotFound");
+        return rtrn;
     }
-    getAllSlotBySpanId(id: number): Slot[] | undefined {
+    getAllSlotBySpanId(id: number): Slot[] {
         return this.slots.filter((el) => el.id === id);
     }
     deleteSpanById(id: number): void {
+        if (this.spans === this.spans.filter((el) => el.id !== id))
+            throw new ReservationServiceErr("Span", "NotFound");
         this.spans = this.spans.filter((el) => el.id !== id);
         this.slots = this.slots.filter((el) => el.idSpan !== id);
     }
     deleteSlotById(id: number): void {
+        if (this.slots === this.slots.filter((el) => el.id !== id))
+            throw new ReservationServiceErr("Slot", "NotFound");
         this.slots = this.slots.filter((el) => el.id !== id);
     }
     updateSpanById(id: number, maj: Span): void {
         maj.id = id;
         let span = this.spans.find((el) => el.id === maj.id);
+        if (!span) throw new ReservationServiceErr("Span", "NotFound");
         span = maj;
     }
     updateSlotById(id: number, maj: Slot): void {
         maj.id = id;
         let slot = this.slots.find((el) => el.id === maj.id);
+        if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
         slot = maj;
+    }
+}
+
+export class ReservationServiceErr {
+    constructor(subject: "Span" | "Slot", msg: "NotFound") {
+        console.error(subject + " : " + msg);
     }
 }

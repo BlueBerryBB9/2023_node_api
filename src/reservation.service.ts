@@ -48,7 +48,6 @@ export class ReservationService implements IReservationService {
     spans: Span[] = [];
     slots: Slot[] = [];
 
-    // A FINIR / NOT WORKING
     makeSlotsFromSpanId(prms: {
         span: Span | number;
         date: Date;
@@ -88,6 +87,15 @@ export class ReservationService implements IReservationService {
             else mod = prms.space;
         }
         return this.slots;
+    }
+
+    addUserToSlotById(str: string, slotId: number) {
+        let index;
+
+        if (!this.slots.find((el) => el.id === slotId))
+            throw new ReservationServiceErr("Span", "NotFound");
+
+        this.slots[this.slots.findIndex((el) => el.id === slotId)].user = str;
     }
 
     findFirstFreeId(table: any[]): number {

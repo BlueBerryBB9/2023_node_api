@@ -571,4 +571,30 @@ describe("reservationService module", () => {
             },
         ]);
     });
+    test("addUserToSlotById found", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 14, 0),
+            desc: "prog c",
+            title: "c",
+        };
+        r.addSpan(sp);
+        r.makeSlotsFromSpanId({
+            span: 1,
+            date: new Date(2024, 3, 18, 12, 15),
+            inc: 15,
+            slot_nb: 1,
+        });
+        r.addUserToSlotById("martin.leroy", 1);
+        expect(r.slots).toStrictEqual([
+            {
+                id: 1,
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
+                idSpan: 1,
+                user: "martin.leroy",
+            },
+        ]);
+    });
 });

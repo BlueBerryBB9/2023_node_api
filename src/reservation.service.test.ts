@@ -472,30 +472,103 @@ describe("reservationService module", () => {
             },
         ]);
     });
-    // test("makeSlotsFromSpanId simple span found", () => {
-    //     let r = new ReservationService();
-    //     let sp: Span = {
-    //         start: new Date(2024, 3, 18, 12, 0),
-    //         end: new Date(2024, 3, 18, 14, 0),
-    //         desc: "prog c",
-    //         title: "c",
-    //     };
-    //     r.addSpan(sp);
-    //     r.makeSlotsFromSpanId({
-
-    //         date: new Date(2024, 3, 18, 12, 44),
-    //         inc: 15,
-    //         slot_nb: 3,
-    //         space: 3,
-    //     });
-    //     expect(r.slots).toStrictEqual([
-    //         {
-    //             id: 1,
-    //             start: new Date(2024, 3, 18, 12, 15),
-    //             end: new Date(2024, 3, 18, 12, 30),
-    //             idSpan: 1,
-    //             user: "noah.chantin",
-    //         },
-    //     ]);
-    // });
+    test("makeSlotsFromSpanId span NOT found", () => {
+        let r = new ReservationService();
+        expect(() =>
+            r.makeSlotsFromSpanId({
+                span: 1,
+                date: new Date(2024, 3, 18, 12, 15),
+                inc: 15,
+                slot_nb: 1,
+            }),
+        ).toThrow(ReservationServiceErr);
+    });
+    test("makeSlotsFromSpanId simple", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 14, 0),
+            desc: "prog c",
+            title: "c",
+        };
+        r.addSpan(sp);
+        r.makeSlotsFromSpanId({
+            span: 1,
+            date: new Date(2024, 3, 18, 12, 15),
+            inc: 15,
+            slot_nb: 1,
+        });
+        expect(r.slots).toStrictEqual([
+            {
+                id: 1,
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
+                idSpan: 1,
+                user: "",
+            },
+        ]);
+    });
+    test("makeSlotsFromSpanId by new span", () => {
+        let r = new ReservationService();
+        r.makeSlotsFromSpanId({
+            span: {
+                start: new Date(2024, 3, 18, 12, 0),
+                end: new Date(2024, 3, 18, 14, 0),
+                desc: "prog c",
+                title: "c",
+            },
+            date: new Date(2024, 3, 18, 12, 15),
+            inc: 15,
+            slot_nb: 1,
+        });
+        expect(r.slots).toStrictEqual([
+            {
+                id: 1,
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
+                idSpan: 1,
+                user: "",
+            },
+        ]);
+    });
+    test("makeSlotsFromSpanId several with space", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 14, 0),
+            desc: "prog c",
+            title: "c",
+        };
+        r.addSpan(sp);
+        r.makeSlotsFromSpanId({
+            span: 1,
+            date: new Date(2024, 3, 18, 12, 15),
+            inc: 15,
+            slot_nb: 3,
+            space: 3,
+        });
+        expect(r.slots).toStrictEqual([
+            {
+                id: 1,
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
+                idSpan: 1,
+                user: "",
+            },
+            {
+                id: 2,
+                start: new Date(2024, 3, 18, 12, 33),
+                end: new Date(2024, 3, 18, 12, 48),
+                idSpan: 1,
+                user: "",
+            },
+            {
+                id: 3,
+                start: new Date(2024, 3, 18, 12, 51),
+                end: new Date(2024, 3, 18, 13, 6),
+                idSpan: 1,
+                user: "",
+            },
+        ]);
+    });
 });

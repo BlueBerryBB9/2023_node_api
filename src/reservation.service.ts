@@ -33,6 +33,15 @@ export interface IReservationService {
     deleteSlotById(id: number): void;
     updateSpanById(id: number, maj: Span): void;
     updateSlotById(id: number, maj: Slot): void;
+    makeSlotsFromSpanId(prms: {
+        span: Span | number;
+        date: Date;
+        inc: number;
+        slot_nb: number;
+        space?: number;
+        pause_rate?: number;
+        pause_time?: number;
+    }): void;
 }
 
 export class ReservationService implements IReservationService {
@@ -51,13 +60,12 @@ export class ReservationService implements IReservationService {
     }) {
         let mod = 0;
         let idSpan: number = 0;
-        let slots_array: Slot[] = [];
         let new_date: Date = new Date(prms.date);
 
         if (typeof prms.span === "object") {
             this.addSpan(prms.span);
             console.log(prms.span);
-            // idSpan = prms.span.id;
+            if (prms.span.id) idSpan = prms.span.id;
         } else if (!this.spans.find((el) => el.id === prms.span))
             throw new ReservationServiceErr("Span", "NotFound");
         else idSpan = prms.span;
@@ -68,18 +76,18 @@ export class ReservationService implements IReservationService {
 
         for (let i = 1; i <= prms.slot_nb; i++) {
             new_date = mk_date_inc(new_date, prms.inc + mod);
-            slots_array.push(
-                this.addSlot({
-                    start: mk_date_inc(new_date, -prms.inc),
-                    end: new_date,
-                    idSpan: idSpan,
-                    user: "",
-                }),
-            );
+
+            this.addSlot({
+                start: mk_date_inc(new_date, -prms.inc),
+                end: new_date,
+                idSpan: idSpan,
+                user: "",
+            });
+
             if (i % prms.pause_rate === 0) mod = prms.pause_time;
             else mod = prms.space;
         }
-        return slots_array;
+        return this.slots;
     }
 
     findFirstFreeId(table: any[]): number {

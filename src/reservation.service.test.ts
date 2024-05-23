@@ -23,6 +23,7 @@ describe("reservationService module", () => {
         r = [{ id: 3 }, { id: 2 }];
         expect(findFirstFreeId(r)).toBe(1);
     });
+
     test("addSpan", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -56,11 +57,23 @@ describe("reservationService module", () => {
             },
         ]);
     });
-    test("addSlot", () => {
+
+    test("addSpan date ARE incoherent", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 0),
+            desc: "prog c",
+            title: "c",
+        };
+        expect(() => r.addSpan(sp)).toThrowError(ReservationServiceErr);
+    });
+
+    test("addSlot simple", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -71,8 +84,8 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         };
         let sl2: Slot = {
-            start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
             user: "noah.chantin",
         };
@@ -89,13 +102,57 @@ describe("reservationService module", () => {
             },
             {
                 id: 2,
-                start: new Date(2024, 3, 18, 12, 0),
-                end: new Date(2024, 3, 18, 12, 15),
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
                 idSpan: 1,
                 user: "noah.chantin",
             },
         ]);
     });
+
+    test("addSlot error : DatesOutOfSpan", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c",
+            title: "c",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 45),
+            idSpan: 1,
+            user: "martin.leroy",
+        };
+        r.addSpan(sp);
+        expect(() => r.addSlot(sl)).toThrow(ReservationServiceErr);
+    });
+
+    test("addSlot error : Slot overlapping", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 45),
+            desc: "prog c",
+            title: "c",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 45),
+            idSpan: 1,
+            user: "martin.leroy",
+        };
+        let sl2: Slot = {
+            start: new Date(2024, 3, 18, 12, 30),
+            end: new Date(2024, 3, 18, 12, 45),
+            idSpan: 1,
+            user: "noah.chantin",
+        };
+        r.addSpan(sp);
+        r.addSlot(sl);
+        expect(() => r.addSlot(sl2)).toThrow(ReservationServiceErr);
+    });
+
     test("getSpanById found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -120,6 +177,7 @@ describe("reservationService module", () => {
             title: "c++",
         });
     });
+
     test("getSpanById not found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -138,11 +196,12 @@ describe("reservationService module", () => {
         r.addSpan(sp2);
         expect(() => r.getSpanById(3)).toThrow(ReservationServiceErr);
     });
+
     test("getSlotById found", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -153,8 +212,8 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         };
         let sl2: Slot = {
-            start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
             user: "noah.chantin",
         };
@@ -169,11 +228,12 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         });
     });
+
     test("getSlotById not found", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -181,19 +241,20 @@ describe("reservationService module", () => {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
-            user: "martin.leroy",
+            user: "noah.chantin",
         };
         let sl2: Slot = {
-            start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
-            user: "noah.chantin",
+            user: "martin.leroy",
         };
         r.addSpan(sp);
         r.addSlot(sl);
         r.addSlot(sl2);
         expect(() => r.getSlotById(3)).toThrow(ReservationServiceErr);
     });
+
     test("getAllSlotById found", () => {
         let r = new ReservationService();
         let sl: Slot = {
@@ -210,7 +271,7 @@ describe("reservationService module", () => {
         };
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -241,7 +302,8 @@ describe("reservationService module", () => {
             },
         ]);
     });
-    test("getAllSlotById not found", () => {
+
+    test("getAllSlotBySpanId not found", () => {
         let r = new ReservationService();
         let sl: Slot = {
             start: new Date(2024, 3, 18, 12, 0),
@@ -263,7 +325,7 @@ describe("reservationService module", () => {
         };
         let sp2: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -273,6 +335,7 @@ describe("reservationService module", () => {
         r.addSlot(sl2);
         expect(r.getAllSlotBySpanId(1)).toStrictEqual([]);
     });
+
     test("deleteSpanById simple found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -300,6 +363,7 @@ describe("reservationService module", () => {
             },
         ]);
     });
+
     test("deleteSpanById simple not found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -309,8 +373,9 @@ describe("reservationService module", () => {
             title: "c",
         };
         r.addSpan(sp);
-        expect(() => r.deleteSpanById(2)).toThrow();
+        expect(() => r.deleteSpanById(2)).toThrow(ReservationServiceErr);
     });
+
     test("deleteSpanById with slots found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -335,7 +400,7 @@ describe("reservationService module", () => {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 2,
-            user: "martin.leroy",
+            user: "noah.chantin",
         };
         r.addSpan(sp);
         r.addSpan(sp2);
@@ -361,11 +426,12 @@ describe("reservationService module", () => {
             },
         ]);
     });
+
     test("deleteSlotById found", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -376,8 +442,8 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         };
         let sl2: Slot = {
-            start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
             user: "noah.chantin",
         };
@@ -388,13 +454,14 @@ describe("reservationService module", () => {
         expect(r.slots).toStrictEqual([
             {
                 id: 2,
-                start: new Date(2024, 3, 18, 12, 0),
-                end: new Date(2024, 3, 18, 12, 15),
+                start: new Date(2024, 3, 18, 12, 15),
+                end: new Date(2024, 3, 18, 12, 30),
                 idSpan: 1,
                 user: "noah.chantin",
             },
         ]);
     });
+
     test("deleteSlotById not found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -413,6 +480,7 @@ describe("reservationService module", () => {
         r.addSlot(sl);
         expect(() => r.deleteSlotById(2)).toThrow(ReservationServiceErr);
     });
+
     test("updateSpanById", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -439,6 +507,7 @@ describe("reservationService module", () => {
             },
         ]);
     });
+
     test("updateSlotById found", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -472,6 +541,7 @@ describe("reservationService module", () => {
             },
         ]);
     });
+
     test("makeSlotsFromSpanId span NOT found", () => {
         let r = new ReservationService();
         expect(() =>
@@ -483,6 +553,7 @@ describe("reservationService module", () => {
             }),
         ).toThrow(ReservationServiceErr);
     });
+
     test("makeSlotsFromSpanId simple", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -504,10 +575,10 @@ describe("reservationService module", () => {
                 start: new Date(2024, 3, 18, 12, 15),
                 end: new Date(2024, 3, 18, 12, 30),
                 idSpan: 1,
-                user: "",
             },
         ]);
     });
+
     test("makeSlotsFromSpanId by new span", () => {
         let r = new ReservationService();
         r.makeSlotsFromSpanId({
@@ -527,10 +598,10 @@ describe("reservationService module", () => {
                 start: new Date(2024, 3, 18, 12, 15),
                 end: new Date(2024, 3, 18, 12, 30),
                 idSpan: 1,
-                user: "",
             },
         ]);
     });
+
     test("makeSlotsFromSpanId several with space", () => {
         let r = new ReservationService();
         let sp: Span = {
@@ -553,48 +624,107 @@ describe("reservationService module", () => {
                 start: new Date(2024, 3, 18, 12, 15),
                 end: new Date(2024, 3, 18, 12, 30),
                 idSpan: 1,
-                user: "",
             },
             {
                 id: 2,
                 start: new Date(2024, 3, 18, 12, 33),
                 end: new Date(2024, 3, 18, 12, 48),
                 idSpan: 1,
-                user: "",
             },
             {
                 id: 3,
                 start: new Date(2024, 3, 18, 12, 51),
                 end: new Date(2024, 3, 18, 13, 6),
                 idSpan: 1,
-                user: "",
             },
         ]);
     });
-    test("addUserToSlotById found", () => {
+
+    test("addUserToSlotById simple", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 14, 0),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 1,
+        };
         r.addSpan(sp);
-        r.makeSlotsFromSpanId({
-            span: 1,
-            date: new Date(2024, 3, 18, 12, 15),
-            inc: 15,
-            slot_nb: 1,
-        });
+        r.addSlot(sl);
         r.addUserToSlotById("martin.leroy", 1);
         expect(r.slots).toStrictEqual([
             {
                 id: 1,
-                start: new Date(2024, 3, 18, 12, 15),
-                end: new Date(2024, 3, 18, 12, 30),
+                start: new Date(2024, 3, 18, 12, 0),
+                end: new Date(2024, 3, 18, 12, 15),
                 idSpan: 1,
                 user: "martin.leroy",
             },
         ]);
+    });
+
+    test("addUserToSlotById error: user already in span", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c",
+            title: "c",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 1,
+        };
+        let sl2: Slot = {
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
+            idSpan: 1,
+        };
+        r.addSpan(sp);
+        r.addSlot(sl);
+        r.addSlot(sl2);
+        r.addUserToSlotById("martin.leroy", 1);
+        expect(() => r.addUserToSlotById("martin.leroy", 1)).toThrow(
+            ReservationServiceErr,
+        );
+    });
+
+    test("addUserToSlotById error: user busy", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c",
+            title: "c",
+        };
+        let sp2: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c++",
+            title: "c++",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 1,
+        };
+        let sl2: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 2,
+        };
+        r.addSpan(sp);
+        r.addSpan(sp2);
+        r.addSlot(sl);
+        r.addUserToSlotById("martin.leroy", 1);
+        r.addSlot(sl2);
+        expect(() => r.addUserToSlotById("martin.leroy", 2)).toThrow(
+            ReservationServiceErr,
+        );
     });
 });

@@ -8,7 +8,7 @@ export type Slot = {
     id?: number;
     start: Date;
     end: Date;
-    user: string;
+    user?: string;
     idSpan: number;
 };
 
@@ -42,6 +42,7 @@ export interface IReservationService {
         pause_rate?: number;
         pause_time?: number;
     }): void;
+    addUserToSlotById(login: string, slotId: number): void;
 }
 
 export class ReservationService implements IReservationService {
@@ -56,14 +57,13 @@ export class ReservationService implements IReservationService {
         space?: number;
         pause_rate?: number;
         pause_time?: number;
-    }) {
+    }): void {
         let mod = 0;
         let idSpan: number = 0;
         let new_date: Date = new Date(prms.date);
 
         if (typeof prms.span === "object") {
             this.addSpan(prms.span);
-            console.log(prms.span);
             if (prms.span.id) idSpan = prms.span.id;
         } else if (!this.spans.find((el) => el.id === prms.span))
             throw new ReservationServiceErr("Span", "NotFound");
@@ -80,22 +80,20 @@ export class ReservationService implements IReservationService {
                 start: mk_date_inc(new_date, -prms.inc),
                 end: new_date,
                 idSpan: idSpan,
-                user: "",
             });
 
             if (i % prms.pause_rate === 0) mod = prms.pause_time;
             else mod = prms.space;
         }
-        return this.slots;
     }
 
-    addUserToSlotById(str: string, slotId: number) {
-        let index;
+    addUserToSlotById(login: string, slotId: number): void {
+        let slot: Slot | undefined = this.slots.find((el) => el.id === slotId);
+        if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
 
-        if (!this.slots.find((el) => el.id === slotId))
-            throw new ReservationServiceErr("Span", "NotFound");
-
-        this.slots[this.slots.findIndex((el) => el.id === slotId)].user = str;
+        this.checkIfUserAlreadyInSpan(login, slot.idSpan);
+        this.checkIfUserBusy(slot, login);
+        this.slots[this.slots.findIndex((el) => el.id === slotId)].user = login;
     }
 
     findFirstFreeId(table: any[]): number {
@@ -104,33 +102,81 @@ export class ReservationService implements IReservationService {
         return cur;
     }
 
+    checkDatesIncoherence(s: Span | Slot) {
+        let msg: "Slot" | "Span" = "idSpan" in s ? "Slot" : "Span";
+        if (s.start >= s.end)
+            throw new ReservationServiceErr(msg, "DatesIncoherent");
+    }
+
     addSpan(span: Span): Span {
         span.id = this.findFirstFreeId(this.spans);
+        this.checkDatesIncoherence(span);
         this.spans.push(span);
         return span;
     }
 
-    IsSpanTimeAlreadyBusy(slot: Slot): void {
+    checkIfSlotDatesInSpanDates(slot: Slot): void {
+        let span: Span | undefined = this.spans.find(
+            (el) => el.id === slot.idSpan,
+        );
+        if (!span) throw new ReservationServiceErr("Span", "NotFound");
         if (
-            this.slots.find((el) => {
-                if (el.idSpan === slot.idSpan) {
-                    return (
-                        el.start < slot.start &&
-                        slot.start < el.end &&
-                        el.start < slot.end &&
-                        slot.end < el.end
-                    );
-                }
-                return false;
-            })
+            slot.start < span.start ||
+            slot.start > span.end ||
+            slot.end < span.start ||
+            slot.end > span.end
         )
-            throw new ReservationServiceErr("Slot", "Overlapping");
+            throw new ReservationServiceErr("Slot", "DatesOutofSpan");
+    }
+
+    checkIfSlotDatesBusyInSpan(slot: Slot) {
+        let span: Span | undefined = this.spans.find(
+            (el) => el.id === slot.idSpan,
+        );
+        if (!span) throw new ReservationServiceErr("Span", "NotFound");
+        const slots = this.getAllSlotBySpanId(slot.idSpan);
+        slots.forEach((el) => {
+            if (
+                (slot.start >= el.start && slot.start < el.end) ||
+                (slot.end > el.start && slot.end <= el.end)
+            )
+                throw new ReservationServiceErr("Slot", "Overlapping");
+        });
+    }
+
+    checkIfUserAlreadyInSpan(login: string, idSpan: number) {
+        const slots = this.getAllSlotBySpanId(idSpan);
+        slots.forEach((el) => {
+            if (login === el.user)
+                throw new ReservationServiceErr("User", "AlreadyInSpan");
+        });
+    }
+
+    getAllSlotsByLogin(login: string): Slot[] {
+        return this.slots.filter((el) => el.user === login);
+    }
+
+    checkIfUserBusy(slot: Slot, login: string) {
+        const slots: Slot[] = this.getAllSlotsByLogin(login);
+        slots.forEach((el) => {
+            if (
+                (slot.start >= el.start && slot.start < el.end) ||
+                (slot.end > el.start && slot.end <= el.end)
+            )
+                throw new ReservationServiceErr("User", "Busy");
+        });
     }
 
     addSlot(slot: Slot): Slot {
         if (!this.spans.find((el) => el.id === slot.idSpan))
             throw new ReservationServiceErr("Span", "NotFound");
-        this.IsSpanTimeAlreadyBusy(slot);
+        this.checkDatesIncoherence(slot);
+        this.checkIfSlotDatesInSpanDates(slot);
+        this.checkIfSlotDatesBusyInSpan(slot);
+        if (slot.user) {
+            this.checkIfUserAlreadyInSpan(slot.user, slot.idSpan);
+            this.checkIfUserBusy(slot, slot.user);
+        }
         slot.id = this.findFirstFreeId(this.slots);
         this.slots.push(slot);
         return slot;
@@ -168,6 +214,7 @@ export class ReservationService implements IReservationService {
     updateSpanById(id: number, maj: Span): void {
         if (!this.spans.find((el) => el.id === id))
             throw new ReservationServiceErr("Span", "NotFound");
+        this.checkDatesIncoherence(maj);
         maj.id = id;
         this.spans[this.spans.findIndex((el) => el.id === id)] = maj;
     }
@@ -175,6 +222,7 @@ export class ReservationService implements IReservationService {
     updateSlotById(id: number, maj: Slot): void {
         if (!this.slots.find((el) => el.id === id))
             throw new ReservationServiceErr("Slot", "NotFound");
+        this.checkDatesIncoherence(maj);
         maj.id = id;
         this.slots[this.slots.findIndex((el) => el.id === id)] = maj;
     }
@@ -182,8 +230,14 @@ export class ReservationService implements IReservationService {
 
 export class ReservationServiceErr {
     constructor(
-        subject: "Span" | "Slot",
-        msg: "NotFound" | "AlreadyExist" | "Overlapping",
+        subject: "Span" | "Slot" | "User",
+        msg:
+            | "NotFound"
+            | "Overlapping"
+            | "DatesIncoherent"
+            | "DatesOutofSpan"
+            | "AlreadyInSpan"
+            | "Busy",
     ) {
         console.log(subject + " : " + msg);
     }

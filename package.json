@@ -22,7 +22,7 @@
     "scripts": {
         "hey": "echo hello world",
         "start": "node dist/",
-        "compile": "tsc dist/",
+        "compile": "tsc",
         "exe": "yarn compile;yarn start",
         "static": "eslint src/",
         "style": "prettier --check src",

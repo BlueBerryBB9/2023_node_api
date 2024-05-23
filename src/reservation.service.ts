@@ -212,18 +212,37 @@ export class ReservationService implements IReservationService {
     }
 
     updateSpanById(id: number, maj: Span): void {
-        if (!this.spans.find((el) => el.id === id))
-            throw new ReservationServiceErr("Span", "NotFound");
-        this.checkDatesIncoherence(maj);
+        let span = this.spans.find((el) => el.id === id);
+        if (!span) throw new ReservationServiceErr("Span", "NotFound");
+
+        if (maj.start != span?.start || maj.end != span?.end)
+            this.checkDatesIncoherence(maj);
+
         maj.id = id;
         this.spans[this.spans.findIndex((el) => el.id === id)] = maj;
     }
 
     updateSlotById(id: number, maj: Slot): void {
-        if (!this.slots.find((el) => el.id === id))
-            throw new ReservationServiceErr("Slot", "NotFound");
-        this.checkDatesIncoherence(maj);
+        let slot = this.slots.find((el) => el.id === id);
+        if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
+
         maj.id = id;
+        if (maj.idSpan !== slot.idSpan)
+            throw new ReservationServiceErr("Slot", "ProhibitedIdSpanChange");
+
+        if (maj.start !== slot?.start || maj.end !== slot?.end) {
+            this.checkDatesIncoherence(maj);
+            this.checkIfSlotDatesInSpanDates(maj);
+            this.checkIfSlotDatesBusyInSpan(maj);
+        }
+
+        if (maj.user !== slot.user) {
+            if (maj.user) {
+                this.checkIfUserAlreadyInSpan(maj.user, maj.idSpan);
+                this.checkIfUserBusy(slot, maj.user);
+            }
+        }
+
         this.slots[this.slots.findIndex((el) => el.id === id)] = maj;
     }
 }
@@ -237,7 +256,8 @@ export class ReservationServiceErr {
             | "DatesIncoherent"
             | "DatesOutofSpan"
             | "AlreadyInSpan"
-            | "Busy",
+            | "Busy"
+            | "ProhibitedIdSpanChange",
     ) {
         console.log(subject + " : " + msg);
     }

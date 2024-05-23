@@ -512,7 +512,7 @@ describe("reservationService module", () => {
         let r = new ReservationService();
         let sp: Span = {
             start: new Date(2024, 3, 18, 12, 0),
-            end: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
@@ -540,6 +540,56 @@ describe("reservationService module", () => {
                 user: "noah.chantin",
             },
         ]);
+    });
+
+    test("updateSlotById notfound", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c",
+            title: "c",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 1,
+            user: "martin.leroy",
+        };
+        let sl2: Slot = {
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
+            idSpan: 1,
+            user: "noah.chantin",
+        };
+        r.addSpan(sp);
+        r.addSlot(sl);
+        expect(() => r.updateSlotById(2, sl2)).toThrow(ReservationServiceErr);
+    });
+
+    test("updateSlotById Prohibited idSpan change", () => {
+        let r = new ReservationService();
+        let sp: Span = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c",
+            title: "c",
+        };
+        let sl: Slot = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
+            idSpan: 1,
+            user: "martin.leroy",
+        };
+        let sl2: Slot = {
+            start: new Date(2024, 3, 18, 12, 15),
+            end: new Date(2024, 3, 18, 12, 30),
+            idSpan: 2,
+            user: "noah.chantin",
+        };
+        r.addSpan(sp);
+        r.addSlot(sl);
+        expect(() => r.updateSlotById(1, sl2)).toThrow(ReservationServiceErr);
     });
 
     test("makeSlotsFromSpanId span NOT found", () => {

@@ -3,8 +3,10 @@
 **recent changes :**
 
 - TD3
+- Custom Error class usage have been changed --> its now extending Error,
+  For tests : it's returning an Error with message
+  In a catch : you can call custom method Error() to return an object with a message and a status Code -> more at the bottom of reservation.service.ts
 
 **current tasks :**
 
 - TD4
-- ask how do we need to specify the span (as parameters : by id or by a Span to create) where adding slots in

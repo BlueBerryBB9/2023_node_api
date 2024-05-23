@@ -2,9 +2,9 @@ import { createDiffieHellmanGroup } from "crypto";
 import {
     ReservationService,
     ReservationServiceErr,
-    Slot,
-    Span,
 } from "./reservation.service.js";
+import * as sl from "./models/slot.js";
+import * as sp from "./models/span.js";
 import { describe, expect, test } from "@jest/globals";
 import { doesNotMatch } from "assert";
 
@@ -26,13 +26,13 @@ describe("reservationService module", () => {
 
     test("addSpan", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c++",
@@ -60,7 +60,7 @@ describe("reservationService module", () => {
 
     test("addSpan date ARE incoherent", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 0),
             desc: "prog c",
@@ -71,19 +71,19 @@ describe("reservationService module", () => {
 
     test("addSlot simple", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -112,13 +112,13 @@ describe("reservationService module", () => {
 
     test("addSlot error : DatesOutOfSpan", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 45),
             idSpan: 1,
@@ -130,19 +130,19 @@ describe("reservationService module", () => {
 
     test("addSlot error : Slot overlapping", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 45),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 45),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 30),
             end: new Date(2024, 3, 18, 12, 45),
             idSpan: 1,
@@ -155,13 +155,13 @@ describe("reservationService module", () => {
 
     test("getSpanById found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c++",
@@ -180,13 +180,13 @@ describe("reservationService module", () => {
 
     test("getSpanById not found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c++",
@@ -199,19 +199,19 @@ describe("reservationService module", () => {
 
     test("getSlotById found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -231,19 +231,19 @@ describe("reservationService module", () => {
 
     test("getSlotById not found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "noah.chantin",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -257,25 +257,25 @@ describe("reservationService module", () => {
 
     test("getAllSlotById found", () => {
         let r = new ReservationService();
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
             user: "noah.chantin",
         };
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
@@ -305,25 +305,25 @@ describe("reservationService module", () => {
 
     test("getAllSlotBySpanId not found", () => {
         let r = new ReservationService();
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 2,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 2,
             user: "noah.chantin",
         };
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
@@ -338,13 +338,13 @@ describe("reservationService module", () => {
 
     test("deleteSpanById simple found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c++",
@@ -366,7 +366,7 @@ describe("reservationService module", () => {
 
     test("deleteSpanById simple not found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
@@ -378,25 +378,25 @@ describe("reservationService module", () => {
 
     test("deleteSpanById with slots found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c++",
             title: "c++",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 2,
@@ -429,19 +429,19 @@ describe("reservationService module", () => {
 
     test("deleteSlotById found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -464,13 +464,13 @@ describe("reservationService module", () => {
 
     test("deleteSlotById not found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
@@ -483,13 +483,13 @@ describe("reservationService module", () => {
 
     test("updateSpanById", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c++",
@@ -510,19 +510,19 @@ describe("reservationService module", () => {
 
     test("updateSlotById found", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -544,19 +544,19 @@ describe("reservationService module", () => {
 
     test("updateSlotById notfound", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -569,19 +569,19 @@ describe("reservationService module", () => {
 
     test("updateSlotById Prohibited idSpan change", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
             user: "martin.leroy",
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 2,
@@ -606,7 +606,7 @@ describe("reservationService module", () => {
 
     test("makeSlotsFromSpanId simple", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 14, 0),
             desc: "prog c",
@@ -654,7 +654,7 @@ describe("reservationService module", () => {
 
     test("makeSlotsFromSpanId several with space", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 14, 0),
             desc: "prog c",
@@ -692,13 +692,13 @@ describe("reservationService module", () => {
 
     test("addUserToSlotById simple", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
@@ -719,18 +719,18 @@ describe("reservationService module", () => {
 
     test("addUserToSlotById error: user already in span", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 15),
             end: new Date(2024, 3, 18, 12, 30),
             idSpan: 1,
@@ -746,24 +746,24 @@ describe("reservationService module", () => {
 
     test("addUserToSlotById error: user busy", () => {
         let r = new ReservationService();
-        let sp: Span = {
+        let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
         };
-        let sp2: Span = {
+        let sp2: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c++",
             title: "c++",
         };
-        let sl: Slot = {
+        let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 1,
         };
-        let sl2: Slot = {
+        let sl2: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 15),
             idSpan: 2,

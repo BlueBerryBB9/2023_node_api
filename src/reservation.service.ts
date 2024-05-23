@@ -1,40 +1,27 @@
+import * as sl from "./models/slot.js";
+import * as sp from "./models/span.js";
+
 function mk_date_inc(date: Date, min: number) {
     let new_date = new Date(date);
     new_date.setMinutes(new_date.getMinutes() + min);
     return new_date;
 }
 
-export type Slot = {
-    id?: number;
-    start: Date;
-    end: Date;
-    user?: string;
-    idSpan: number;
-};
-
-export type Span = {
-    id?: number;
-    start: Date;
-    end: Date;
-    desc: string;
-    title: string;
-};
-
 export interface IReservationService {
-    spans: Span[];
-    slots: Slot[];
+    spans: sp.Span[];
+    slots: sl.Slot[];
 
-    addSpan(span: Span): Span;
-    addSlot(slot: Slot): Slot;
-    getSpanById(id: number): Span;
-    getSlotById(id: number): Slot;
-    getAllSlotBySpanId(id: number): Slot[];
-    deleteSpanById(id: number): void;
+    addSlot(slot: sl.InputSlot): sl.Slot;
+    addSpan(span: sp.InputSpan): sp.Span;
+    getSlotById(id: number): sl.Slot;
+    getSpanById(id: number): sp.Span;
+    getAllSlotBySpanId(id: number): sl.Slot[];
     deleteSlotById(id: number): void;
-    updateSpanById(id: number, maj: Span): void;
-    updateSlotById(id: number, maj: Slot): void;
+    deleteSpanById(id: number): void;
+    updateSlotById(id: number, maj: sl.InputSlot): void;
+    updateSpanById(id: number, maj: sp.InputSpan): void;
     makeSlotsFromSpanId(prms: {
-        span: Span | number;
+        span: sp.InputSpan | number;
         date: Date;
         inc: number;
         slot_nb: number;
@@ -46,11 +33,11 @@ export interface IReservationService {
 }
 
 export class ReservationService implements IReservationService {
-    spans: Span[] = [];
-    slots: Slot[] = [];
+    spans: sp.Span[] = [];
+    slots: sl.Slot[] = [];
 
     makeSlotsFromSpanId(prms: {
-        span: Span | number;
+        span: sp.InputSpan | number;
         date: Date;
         inc: number;
         slot_nb: number;
@@ -63,8 +50,8 @@ export class ReservationService implements IReservationService {
         let new_date: Date = new Date(prms.date);
 
         if (typeof prms.span === "object") {
-            this.addSpan(prms.span);
-            if (prms.span.id) idSpan = prms.span.id;
+            let n_span = this.addSpan(prms.span);
+            idSpan = n_span.id;
         } else if (!this.spans.find((el) => el.id === prms.span))
             throw new ReservationServiceErr("Span", "NotFound");
         else idSpan = prms.span;
@@ -79,7 +66,7 @@ export class ReservationService implements IReservationService {
             this.addSlot({
                 start: mk_date_inc(new_date, -prms.inc),
                 end: new_date,
-                idSpan: idSpan,
+                idSpan,
             });
 
             if (i % prms.pause_rate === 0) mod = prms.pause_time;
@@ -88,7 +75,9 @@ export class ReservationService implements IReservationService {
     }
 
     addUserToSlotById(login: string, slotId: number): void {
-        let slot: Slot | undefined = this.slots.find((el) => el.id === slotId);
+        let slot: sl.Slot | undefined = this.slots.find(
+            (el) => el.id === slotId,
+        );
         if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
 
         this.checkIfUserAlreadyInSpan(login, slot.idSpan);
@@ -102,21 +91,23 @@ export class ReservationService implements IReservationService {
         return cur;
     }
 
-    checkDatesIncoherence(s: Span | Slot) {
+    checkDatesIncoherence(s: sp.Span | sl.Slot) {
         let msg: "Slot" | "Span" = "idSpan" in s ? "Slot" : "Span";
         if (s.start >= s.end)
             throw new ReservationServiceErr(msg, "DatesIncoherent");
     }
 
-    addSpan(span: Span): Span {
-        span.id = this.findFirstFreeId(this.spans);
-        this.checkDatesIncoherence(span);
-        this.spans.push(span);
-        return span;
+    addSpan(span: sp.InputSpan): sp.Span {
+        let id = this.findFirstFreeId(this.spans);
+        let sp: sp.Span = { ...span, id };
+
+        this.checkDatesIncoherence(sp);
+        this.spans.push(sp);
+        return sp;
     }
 
-    checkIfSlotDatesInSpanDates(slot: Slot): void {
-        let span: Span | undefined = this.spans.find(
+    checkIfSlotDatesInSpanDates(slot: sl.Slot): void {
+        let span: sp.Span | undefined = this.spans.find(
             (el) => el.id === slot.idSpan,
         );
         if (!span) throw new ReservationServiceErr("Span", "NotFound");
@@ -129,8 +120,8 @@ export class ReservationService implements IReservationService {
             throw new ReservationServiceErr("Slot", "DatesOutofSpan");
     }
 
-    checkIfSlotDatesBusyInSpan(slot: Slot) {
-        let span: Span | undefined = this.spans.find(
+    checkIfSlotDatesBusyInSpan(slot: sl.Slot) {
+        let span: sp.Span | undefined = this.spans.find(
             (el) => el.id === slot.idSpan,
         );
         if (!span) throw new ReservationServiceErr("Span", "NotFound");
@@ -152,12 +143,12 @@ export class ReservationService implements IReservationService {
         });
     }
 
-    getAllSlotsByLogin(login: string): Slot[] {
+    getAllSlotsByLogin(login: string): sl.Slot[] {
         return this.slots.filter((el) => el.user === login);
     }
 
-    checkIfUserBusy(slot: Slot, login: string) {
-        const slots: Slot[] = this.getAllSlotsByLogin(login);
+    checkIfUserBusy(slot: sl.Slot, login: string) {
+        const slots: sl.Slot[] = this.getAllSlotsByLogin(login);
         slots.forEach((el) => {
             if (
                 (slot.start >= el.start && slot.start < el.end) ||
@@ -167,34 +158,36 @@ export class ReservationService implements IReservationService {
         });
     }
 
-    addSlot(slot: Slot): Slot {
+    addSlot(slot: sl.InputSlot): sl.Slot {
+        let id = this.findFirstFreeId(this.slots);
+        let sl: sl.Slot = { ...slot, id };
+
         if (!this.spans.find((el) => el.id === slot.idSpan))
             throw new ReservationServiceErr("Span", "NotFound");
-        this.checkDatesIncoherence(slot);
-        this.checkIfSlotDatesInSpanDates(slot);
-        this.checkIfSlotDatesBusyInSpan(slot);
-        if (slot.user) {
-            this.checkIfUserAlreadyInSpan(slot.user, slot.idSpan);
-            this.checkIfUserBusy(slot, slot.user);
+        this.checkDatesIncoherence(sl);
+        this.checkIfSlotDatesInSpanDates(sl);
+        this.checkIfSlotDatesBusyInSpan(sl);
+        if (sl.user) {
+            this.checkIfUserAlreadyInSpan(sl.user, slot.idSpan);
+            this.checkIfUserBusy(sl, sl.user);
         }
-        slot.id = this.findFirstFreeId(this.slots);
-        this.slots.push(slot);
-        return slot;
+        this.slots.push(sl);
+        return sl;
     }
 
-    getSpanById(id: number): Span {
+    getSpanById(id: number): sp.Span {
         let rtrn = this.spans.find((el) => el.id === id);
         if (!rtrn) throw new ReservationServiceErr("Span", "NotFound");
         return rtrn;
     }
 
-    getSlotById(id: number): Slot {
+    getSlotById(id: number): sl.Slot {
         let rtrn = this.slots.find((el) => el.id === id);
         if (!rtrn) throw new ReservationServiceErr("Slot", "NotFound");
         return rtrn;
     }
 
-    getAllSlotBySpanId(id: number): Slot[] {
+    getAllSlotBySpanId(id: number): sl.Slot[] {
         return this.slots.filter((el) => el.idSpan === id);
     }
 
@@ -211,39 +204,40 @@ export class ReservationService implements IReservationService {
         this.slots = this.slots.filter((el) => el.id !== id);
     }
 
-    updateSpanById(id: number, maj: Span): void {
+    updateSpanById(id: number, maj: sp.InputSpan): void {
         let span = this.spans.find((el) => el.id === id);
         if (!span) throw new ReservationServiceErr("Span", "NotFound");
 
-        if (maj.start != span?.start || maj.end != span?.end)
-            this.checkDatesIncoherence(maj);
+        let sp: sp.Span = { ...maj, id };
+        if (sp.start != span?.start || sp.end != span?.end)
+            this.checkDatesIncoherence(sp);
 
-        maj.id = id;
-        this.spans[this.spans.findIndex((el) => el.id === id)] = maj;
+        sp.id = id;
+        this.spans[this.spans.findIndex((el) => el.id === id)] = sp;
     }
 
-    updateSlotById(id: number, maj: Slot): void {
+    updateSlotById(id: number, maj: sl.InputSlot): void {
         let slot = this.slots.find((el) => el.id === id);
         if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
 
-        maj.id = id;
-        if (maj.idSpan !== slot.idSpan)
+        let sl: sl.Slot = { ...maj, id };
+        if (sl.idSpan !== slot.idSpan)
             throw new ReservationServiceErr("Slot", "ProhibitedIdSpanChange");
 
-        if (maj.start !== slot?.start || maj.end !== slot?.end) {
-            this.checkDatesIncoherence(maj);
-            this.checkIfSlotDatesInSpanDates(maj);
-            this.checkIfSlotDatesBusyInSpan(maj);
+        if (sl.start !== slot?.start || sl.end !== slot?.end) {
+            this.checkDatesIncoherence(sl);
+            this.checkIfSlotDatesInSpanDates(sl);
+            this.checkIfSlotDatesBusyInSpan(sl);
         }
 
-        if (maj.user !== slot.user) {
-            if (maj.user) {
-                this.checkIfUserAlreadyInSpan(maj.user, maj.idSpan);
-                this.checkIfUserBusy(slot, maj.user);
+        if (sl.user !== slot.user) {
+            if (sl.user) {
+                this.checkIfUserAlreadyInSpan(sl.user, sl.idSpan);
+                this.checkIfUserBusy(slot, sl.user);
             }
         }
 
-        this.slots[this.slots.findIndex((el) => el.id === id)] = maj;
+        this.slots[this.slots.findIndex((el) => el.id === id)] = sl;
     }
 }
 
@@ -261,4 +255,7 @@ export class ReservationServiceErr {
     ) {
         console.log(subject + " : " + msg);
     }
+}
+export function addSlot(sl: sl.Slot) {
+    throw new Error("Function not implemented.");
 }

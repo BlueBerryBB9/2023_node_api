@@ -25,6 +25,7 @@ __metadata:
     typescript: "npm:^5.4.5"
     typescript-eslint: "npm:^7.6.0"
     zod: "npm:^3.23.8"
+    zod-validation-error: "npm:^3.3.0"
   languageName: unknown
   linkType: soft
 
@@ -5193,6 +5194,15 @@ __metadata:
   peerDependencies:
     zod: ^3.23.3
   checksum: 10c0/bcd966fa040765d7170a89c0c5f1717575e7d8823b84cbbb606689d494ae308c9eaadd4b71a74752e3170deef64c1f1bb2985f4663c44a0ed2e7854ff6fda724
+  languageName: node
+  linkType: hard
+
+"zod-validation-error@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "zod-validation-error@npm:3.3.0"
+  peerDependencies:
+    zod: ^3.18.0
+  checksum: 10c0/a233dca6dc9a2237aa7b677cc8ce022c2b6f90894fd4d1e2c7b239d2aad38f36f3b84bf7f7cfaff5bf97fce31e1010d2736ca1ec539e0e8cb8bb9d05977911a2
   languageName: node
   linkType: hard
 

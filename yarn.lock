@@ -15,6 +15,7 @@ __metadata:
     "@types/node": "npm:^20.12.7"
     eslint: "npm:^9.0.0"
     fastify: "npm:^4.27.0"
+    fastify-type-provider-zod: "npm:^1.2.0"
     jest: "npm:^29.7.0"
     lolcatjs: "npm:^2.4.3"
     nodemon: "npm:^3.1.0"
@@ -23,6 +24,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.4.5"
     typescript-eslint: "npm:^7.6.0"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -2315,6 +2317,18 @@ __metadata:
   version: 2.3.0
   resolution: "fast-uri@npm:2.3.0"
   checksum: 10c0/72844622c8b9d92dbb783723628d1069c999b31bfaa74af9e9afae0e0c22faf18c988a0ce55e775dce4c404f4cca75fa43e1f0ab07075342cff99796f4920945
+  languageName: node
+  linkType: hard
+
+"fastify-type-provider-zod@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "fastify-type-provider-zod@npm:1.2.0"
+  dependencies:
+    zod-to-json-schema: "npm:^3.23.0"
+  peerDependencies:
+    fastify: ^4.0.0
+    zod: ^3.14.2
+  checksum: 10c0/e9b7a39cac4b11b10b56cec6381a7c5b7251c51d5ccfd4febcf0b50e4c4080c39eba150cde735117ddd5f40fd6260ee6f5c77ac96f2571670c2e1dc99a612cce
   languageName: node
   linkType: hard
 
@@ -5170,5 +5184,21 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zod-to-json-schema@npm:^3.23.0":
+  version: 3.23.0
+  resolution: "zod-to-json-schema@npm:3.23.0"
+  peerDependencies:
+    zod: ^3.23.3
+  checksum: 10c0/bcd966fa040765d7170a89c0c5f1717575e7d8823b84cbbb606689d494ae308c9eaadd4b71a74752e3170deef64c1f1bb2985f4663c44a0ed2e7854ff6fda724
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8":
+  version: 3.23.8
+  resolution: "zod@npm:3.23.8"
+  checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
   languageName: node
   linkType: hard

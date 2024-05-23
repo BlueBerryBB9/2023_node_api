@@ -3,7 +3,10 @@
     "packageManager": "yarn@4.1.1",
     "type": "module",
     "dependencies": {
-        "lolcatjs": "^2.4.3"
+        "fastify": "^4.27.0",
+        "fastify-type-provider-zod": "^1.2.0",
+        "lolcatjs": "^2.4.3",
+        "zod": "^3.23.8"
     },
     "devDependencies": {
         "@eslint/js": "^9.0.0",

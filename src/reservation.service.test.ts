@@ -66,7 +66,7 @@ describe("reservationService module", () => {
             desc: "prog c",
             title: "c",
         };
-        expect(() => r.addSpan(sp)).toThrowError(ReservationServiceErr);
+        expect(() => r.addSpan(sp)).toThrow(Error("Span : DatesIncoherent"));
     });
 
     test("addSlot simple", () => {
@@ -125,7 +125,7 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         };
         r.addSpan(sp);
-        expect(() => r.addSlot(sl)).toThrow(ReservationServiceErr);
+        expect(() => r.addSlot(sl)).toThrow(Error("Slot : DatesOutofSpan"));
     });
 
     test("addSlot error : Slot overlapping", () => {
@@ -150,7 +150,7 @@ describe("reservationService module", () => {
         };
         r.addSpan(sp);
         r.addSlot(sl);
-        expect(() => r.addSlot(sl2)).toThrow(ReservationServiceErr);
+        expect(() => r.addSlot(sl2)).toThrow(Error("Slot : Overlapping"));
     });
 
     test("getSpanById found", () => {
@@ -194,7 +194,7 @@ describe("reservationService module", () => {
         };
         r.addSpan(sp);
         r.addSpan(sp2);
-        expect(() => r.getSpanById(3)).toThrow(ReservationServiceErr);
+        expect(() => r.getSpanById(3)).toThrow(Error("Span : NotFound"));
     });
 
     test("getSlotById found", () => {
@@ -252,7 +252,7 @@ describe("reservationService module", () => {
         r.addSpan(sp);
         r.addSlot(sl);
         r.addSlot(sl2);
-        expect(() => r.getSlotById(3)).toThrow(ReservationServiceErr);
+        expect(() => r.getSlotById(3)).toThrow(Error("Slot : NotFound"));
     });
 
     test("getAllSlotById found", () => {
@@ -373,7 +373,7 @@ describe("reservationService module", () => {
             title: "c",
         };
         r.addSpan(sp);
-        expect(() => r.deleteSpanById(2)).toThrow(ReservationServiceErr);
+        expect(() => r.deleteSpanById(2)).toThrow(Error("Span : NotFound"));
     });
 
     test("deleteSpanById with slots found", () => {
@@ -478,7 +478,7 @@ describe("reservationService module", () => {
         };
         r.addSpan(sp);
         r.addSlot(sl);
-        expect(() => r.deleteSlotById(2)).toThrow(ReservationServiceErr);
+        expect(() => r.deleteSlotById(2)).toThrow(Error("Slot : NotFound"));
     });
 
     test("updateSpanById", () => {
@@ -564,7 +564,9 @@ describe("reservationService module", () => {
         };
         r.addSpan(sp);
         r.addSlot(sl);
-        expect(() => r.updateSlotById(2, sl2)).toThrow(ReservationServiceErr);
+        expect(() => r.updateSlotById(2, sl2)).toThrow(
+            Error("Slot : NotFound"),
+        );
     });
 
     test("updateSlotById Prohibited idSpan change", () => {
@@ -589,7 +591,9 @@ describe("reservationService module", () => {
         };
         r.addSpan(sp);
         r.addSlot(sl);
-        expect(() => r.updateSlotById(1, sl2)).toThrow(ReservationServiceErr);
+        expect(() => r.updateSlotById(1, sl2)).toThrow(
+            Error("Slot : ProhibitedIdSpanChange"),
+        );
     });
 
     test("makeSlotsFromSpanId span NOT found", () => {
@@ -601,7 +605,7 @@ describe("reservationService module", () => {
                 inc: 15,
                 slot_nb: 1,
             }),
-        ).toThrow(ReservationServiceErr);
+        ).toThrow(Error("Span : NotFound"));
     });
 
     test("makeSlotsFromSpanId simple", () => {
@@ -740,7 +744,7 @@ describe("reservationService module", () => {
         r.addSlot(sl2);
         r.addUserToSlotById("martin.leroy", 1);
         expect(() => r.addUserToSlotById("martin.leroy", 1)).toThrow(
-            ReservationServiceErr,
+            Error("User : AlreadyInSpan"),
         );
     });
 
@@ -774,7 +778,7 @@ describe("reservationService module", () => {
         r.addUserToSlotById("martin.leroy", 1);
         r.addSlot(sl2);
         expect(() => r.addUserToSlotById("martin.leroy", 2)).toThrow(
-            ReservationServiceErr,
+            Error("User : Busy"),
         );
     });
 });

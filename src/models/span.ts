@@ -3,8 +3,8 @@ import z from "zod";
 
 export const ZSpan = z.object({
     id: z.number(),
-    start: z.date(),
-    end: z.date(),
+    start: z.coerce.date(),
+    end: z.coerce.date(),
     desc: z.string(),
     title: z.string(),
 });

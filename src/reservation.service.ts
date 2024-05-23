@@ -241,7 +241,9 @@ export class ReservationService implements IReservationService {
     }
 }
 
-export class ReservationServiceErr {
+export class ReservationServiceErr extends Error {
+    statusCode: number;
+    message: string;
     constructor(
         subject: "Span" | "Slot" | "User",
         msg:
@@ -252,10 +254,16 @@ export class ReservationServiceErr {
             | "AlreadyInSpan"
             | "Busy"
             | "ProhibitedIdSpanChange",
+        statusCode?: number,
     ) {
-        console.log(subject + " : " + msg);
+        super(subject + " : " + msg);
+        this.message = subject + " : " + msg;
+        this.statusCode = statusCode ? statusCode : 500;
     }
-}
-export function addSlot(sl: sl.Slot) {
-    throw new Error("Function not implemented.");
+    Error() {
+        return {
+            message: this.message,
+            status: this.statusCode,
+        };
+    }
 }

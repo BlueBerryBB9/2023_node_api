@@ -20,11 +20,9 @@ export function start_web_server() {
         if (error instanceof z.ZodError) {
             const valerror = fromError(error);
             reply.code(error.statusCode || 400);
-            return { message: valerror.toString() };
-        } else {
-            reply.status(500);
-            console.error(error);
-            return { message: "i don't know what to do with this error" };
+            return { status: error.statusCode, message: valerror.toString() };
+        } else if (error instanceof reserv.ReservationServiceErr) {
+            return error.Error();
         }
     });
 
@@ -55,6 +53,7 @@ export function start_web_server() {
 
     const operations: Operation[] = [];
 
+    // http POST 127.0.0.1:1234/operations rhs:=2 lhs:=3 kind=ADD
     web_server.post<{
         Body: Omit<Operation, "res">;
     }>(
@@ -83,10 +82,12 @@ export function start_web_server() {
         },
     );
 
+    // http GET 127.0.0.1:1234/operations
     web_server.get("/operations", async (req, res) => {
-        return res.status(201).send({ data: operations, message: "success" });
+        return res.status(201).send({ operations, message: "success" });
     });
 
+    // http GET 127.0.0.1:1234/operations/ID
     web_server.get<{ Params: { id: string } }>(
         "/operations/:id",
         { schema: { params: z.object({ id: z.string() }) } },
@@ -100,26 +101,32 @@ export function start_web_server() {
         },
     );
 
+    ///////////////////////////////////////////////////////////////////////////
+
+    // http POST 127.0.0.1:1234/slots start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
     web_server.post<{ Body: sl.InputSlot }>(
         "/slots",
         { schema: { body: sl.ZInputSlot } },
         async (req, res) => {
-            r.addSlot(req.body);
+            let data = r.addSlot(req.body);
 
-            return res.status(201).send({ message: "Created" });
+            return res.status(201).send({ data: [data], message: "Created" });
         },
     );
 
+    // http GET 127.0.0.1:1234/slots/ID
     web_server.get<{ Params: { id: string } }>(
         "/slots/:id",
         { schema: { params: z.object({ id: z.string() }) } },
         async (req, res) => {
             let id: number = parseInt(req.params.id);
 
-            if (isNaN(id) || id < 1 || id > operations.length)
+            if (isNaN(id) || id < 1 || id > r.slots.length)
                 return res.status(404).send({ error: "Invalid id" });
 
-            return res.status(200).send(r.getSlotById(id));
+            return res
+                .status(200)
+                .send({ data: [r.getSlotById(id)], message: "Slot Found" });
         },
     );
 
@@ -131,26 +138,31 @@ export function start_web_server() {
 
     ///////////////////////////////////////////////////////////////////////////
 
+    // http POST 127.0.0.1:1234/spans start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z
     web_server.post<{ Body: sp.InputSpan }>(
         "/spans",
         { schema: { body: sp.ZInputSpan } },
         async (req, res) => {
-            r.addSpan(req.body);
+            let data = r.addSpan(req.body);
 
-            return res.status(201).send({ message: "Created" });
+            return res.status(201).send({ data: [data], message: "Created" });
         },
     );
 
+    // http GET 127.0.0.1:1234/spans/ID
     web_server.get<{ Params: { id: string } }>(
-        "/span/:id",
+        "/spans/:id",
         { schema: { params: z.object({ id: z.string() }) } },
         async (req, res) => {
             let id: number = parseInt(req.params.id);
 
-            if (isNaN(id) || id < 1 || id > operations.length)
+            // if (isNaN(id) || id < 1 || id > r.spans.length)
+            if (isNaN(id) || id < 1)
                 return res.status(404).send({ error: "Invalid id" });
 
-            return res.status(200).send(r.getSpanById(id));
+            return res
+                .status(200)
+                .send({ data: [r.getSpanById(id)], message: " Span Found" });
         },
     );
 

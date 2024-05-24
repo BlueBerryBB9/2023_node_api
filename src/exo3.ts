@@ -1,6 +1,7 @@
 export function mk_login(login: string) {
     login = login
         .toLowerCase()
+        .replaceAll(".", " ")
         .trim()
         .replace(" ", ".")
         .replaceAll(" ", "")

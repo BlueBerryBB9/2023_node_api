@@ -107,6 +107,7 @@ export function start_web_server() {
     );
 
     ///////////////////////////////////////////////////////////////////////////
+    // SLOTS OPERATIONS
 
     // http POST 127.0.0.1:1234/slots start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
     web_server.post<{ Body: sl.InputSlot }>(
@@ -184,6 +185,7 @@ export function start_web_server() {
     );
 
     ///////////////////////////////////////////////////////////////////////////
+    // SPANS OPERATIONS
 
     // http POST 127.0.0.1:1234/spans start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
     web_server.post<{ Body: sp.InputSpan }>(

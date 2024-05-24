@@ -170,6 +170,7 @@ export function start_web_server() {
         },
     );
 
+    // http DELETE 127.0.0.1:1234/slots/ID
     web_server.delete<{ Params: { id: string } }>(
         "/slots/:id",
         async (req, res) => {
@@ -248,6 +249,7 @@ export function start_web_server() {
         },
     );
 
+    // http DELETE 127.0.0.1:1234/spans/ID
     web_server.delete<{ Params: { id: string } }>(
         "/spans/:id",
         async (req, res) => {
@@ -261,6 +263,52 @@ export function start_web_server() {
             return res.status(200).send({ message: "Span delete" });
         },
     );
+
+    // web_server.post<{ Params: { id: string }; Body: string }>(
+    //     "/slots/:id",
+    //     {
+    //         schema: {
+    //             params: z.object({ id: z.string() }),
+    //             body: z.string(),
+    //         },
+    //     },
+    //     async (req, res) => {
+    //         let id: number = parseInt(req.params.id);
+
+    //         if (isNaN(id) || id < 1)
+    //             return res.status(404).send({ error: "Invalid id" });
+
+    //         r.updateSpanById(id, req.body);
+
+    //         return res.status(201).send({
+    //             data: { span: r.getSpanById(id) },
+    //             message: "Updated",
+    //         });
+    //     },
+    // );
+
+    // web_server.post<{ Params: { id: string }; Body:  }>(
+    //     "/spans/:id",
+    //     {
+    //         schema: {
+    //             params: z.object({ id: z.string() }),
+    //             body: sp.ZInputSpan,
+    //         },
+    //     },
+    //     async (req, res) => {
+    //         let id: number = parseInt(req.params.id);
+
+    //         if (isNaN(id) || id < 1)
+    //             return res.status(404).send({ error: "Invalid id" });
+
+    //         r.updateSpanById(id, req.body);
+
+    //         return res.status(201).send({
+    //             data: { span: r.getSpanById(id) },
+    //             message: "Updated",
+    //         });
+    //     },
+    // );
 
     web_server.listen({ port: 1234, host: "0.0.0.0" }, (err, address) => {
         if (err) {

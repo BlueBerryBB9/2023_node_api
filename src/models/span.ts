@@ -1,6 +1,7 @@
 import * as reserv from "../reservation.service.js";
 import z from "zod";
 
+// A MODIF : AJOUTER UNE LISTE DE SLOT ID
 export const ZSpan = z.object({
     id: z.number(),
     start: z.coerce.date(),

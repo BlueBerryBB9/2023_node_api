@@ -125,7 +125,8 @@ export class ReservationService implements IReservationService {
             (el) => el.id === slot.idSpan,
         );
         if (!span) throw new ReservationServiceErr("Span", "NotFound");
-        const slots = this.getAllSlotBySpanId(slot.idSpan);
+        let slots = this.getAllSlotBySpanId(slot.idSpan);
+        slots = slots.filter((el) => el.id !== slot.id);
         slots.forEach((el) => {
             if (
                 (slot.start >= el.start && slot.start < el.end) ||
@@ -148,7 +149,8 @@ export class ReservationService implements IReservationService {
     }
 
     checkIfUserBusy(slot: sl.Slot, login: string) {
-        const slots: sl.Slot[] = this.getAllSlotsByLogin(login);
+        let slots: sl.Slot[] = this.getAllSlotsByLogin(login);
+        slots = slots.filter((el) => el.id !== slot.id);
         slots.forEach((el) => {
             if (
                 (slot.start >= el.start && slot.start < el.end) ||
@@ -164,9 +166,11 @@ export class ReservationService implements IReservationService {
 
         if (!this.spans.find((el) => el.id === slot.idSpan))
             throw new ReservationServiceErr("Span", "NotFound");
+
         this.checkDatesIncoherence(sl);
         this.checkIfSlotDatesInSpanDates(sl);
         this.checkIfSlotDatesBusyInSpan(sl);
+
         if (sl.user) {
             this.checkIfUserAlreadyInSpan(sl.user, slot.idSpan);
             this.checkIfUserBusy(sl, sl.user);
@@ -204,13 +208,31 @@ export class ReservationService implements IReservationService {
         this.slots = this.slots.filter((el) => el.id !== id);
     }
 
+    checkIfSpanCanContainsSlots(s: sp.Span) {
+        let slots: sl.Slot[] = this.getAllSlotBySpanId(s.id);
+        if (slots.length === 0) return;
+        let maxDate: Date = this.slots[0].end;
+        let minDate: Date = this.slots[0].start;
+
+        slots.forEach((el) => {
+            if (maxDate < el.end) maxDate = el.end;
+            if (minDate > el.start) minDate = el.start;
+        });
+        if (maxDate > s.end)
+            throw new ReservationServiceErr("Span", "NotEnoughSpace");
+        if (minDate < s.start)
+            throw new ReservationServiceErr("Span", "NotEnoughSpace");
+    }
+
     updateSpanById(id: number, maj: sp.InputSpan): void {
         let span = this.spans.find((el) => el.id === id);
         if (!span) throw new ReservationServiceErr("Span", "NotFound");
 
         let sp: sp.Span = { ...maj, id };
-        if (sp.start != span?.start || sp.end != span?.end)
+        if (sp.start != span.start || sp.end != span.end) {
             this.checkDatesIncoherence(sp);
+            this.checkIfSpanCanContainsSlots(sp);
+        }
 
         sp.id = id;
         this.spans[this.spans.findIndex((el) => el.id === id)] = sp;
@@ -220,20 +242,24 @@ export class ReservationService implements IReservationService {
         let slot = this.slots.find((el) => el.id === id);
         if (!slot) throw new ReservationServiceErr("Slot", "NotFound");
 
+        let spanIdChanged: boolean = false;
         let sl: sl.Slot = { ...maj, id };
-        if (sl.idSpan !== slot.idSpan)
-            throw new ReservationServiceErr("Slot", "ProhibitedIdSpanChange");
+        if (sl.idSpan !== slot.idSpan) {
+            if (!this.spans.find((el) => el.id === id))
+                throw new ReservationServiceErr("Span", "NotFound");
+            spanIdChanged = true;
+        }
 
-        if (sl.start !== slot?.start || sl.end !== slot?.end) {
+        if (sl.start !== slot.start || sl.end !== slot.end || spanIdChanged) {
             this.checkDatesIncoherence(sl);
             this.checkIfSlotDatesInSpanDates(sl);
             this.checkIfSlotDatesBusyInSpan(sl);
         }
 
-        if (sl.user !== slot.user) {
+        if (sl.user !== slot.user || spanIdChanged) {
             if (sl.user) {
                 this.checkIfUserAlreadyInSpan(sl.user, sl.idSpan);
-                this.checkIfUserBusy(slot, sl.user);
+                this.checkIfUserBusy(sl, sl.user);
             }
         }
 
@@ -253,7 +279,8 @@ export class ReservationServiceErr extends Error {
             | "DatesOutofSpan"
             | "AlreadyInSpan"
             | "Busy"
-            | "ProhibitedIdSpanChange",
+            | "ProhibitedIdSpanChange"
+            | "NotEnoughSpace",
         statusCode?: number,
     ) {
         super(subject + " : " + msg);

@@ -84,7 +84,9 @@ export function start_web_server() {
 
     // http GET 127.0.0.1:1234/operations
     web_server.get("/operations", async (req, res) => {
-        return res.status(201).send({ operations, message: "success" });
+        return res
+            .status(201)
+            .send({ data: { operations: operations }, message: "success" });
     });
 
     // http GET 127.0.0.1:1234/operations/ID
@@ -94,10 +96,13 @@ export function start_web_server() {
         async (req, res) => {
             let id: number = parseInt(req.params.id);
 
-            if (isNaN(id) || id < 1 || id > operations.length)
+            if (isNaN(id) || id < 1)
                 return res.status(404).send({ error: "Invalid id" });
 
-            return res.status(200).send(operations[id - 1]);
+            return res.status(200).send({
+                data: { operations: operations[id - 1] },
+                message: "Operation Found",
+            });
         },
     );
 
@@ -110,7 +115,9 @@ export function start_web_server() {
         async (req, res) => {
             let data = r.addSlot(req.body);
 
-            return res.status(201).send({ data: [data], message: "Created" });
+            return res
+                .status(201)
+                .send({ data: { slot: data }, message: "Created" });
         },
     );
 
@@ -121,31 +128,73 @@ export function start_web_server() {
         async (req, res) => {
             let id: number = parseInt(req.params.id);
 
-            if (isNaN(id) || id < 1 || id > r.slots.length)
+            if (isNaN(id) || id < 1)
                 return res.status(404).send({ error: "Invalid id" });
 
-            return res
-                .status(200)
-                .send({ data: [r.getSlotById(id)], message: "Slot Found" });
+            return res.status(200).send({
+                data: { slots: r.getSlotById(id) },
+                message: "Slot Found",
+            });
         },
     );
 
-    // web_server.get<{}>("/slots/list", {}, async (req, re) => {});
+    // http GET 127.0.0.1:1234/slots
+    web_server.get("/slots", async (req, res) => {
+        return res
+            .status(201)
+            .send({ data: { slots: r.slots }, message: "success" });
+    });
 
-    // web_server.post<{}>("/slots/edit/:id", {}, async (req, re) => {});
+    // http POST 127.0.0.1:1234/slots/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
+    web_server.post<{ Params: { id: string }; Body: sl.InputSlot }>(
+        "/slots/:id",
+        {
+            schema: {
+                params: z.object({ id: z.string() }),
+                body: sl.ZInputSlot,
+            },
+        },
+        async (req, res) => {
+            let id: number = parseInt(req.params.id);
 
-    // web_server.post<{}>("/slots/delete/:id", {}, async (req, re) => {});
+            if (isNaN(id) || id < 1)
+                return res.status(404).send({ error: "Invalid id" });
+
+            r.updateSlotById(id, req.body);
+
+            return res.status(201).send({
+                data: { slot: r.getSlotById(id) },
+                message: "Updated",
+            });
+        },
+    );
+
+    web_server.delete<{ Params: { id: string } }>(
+        "/slots/:id",
+        async (req, res) => {
+            let id: number = parseInt(req.params.id);
+
+            if (isNaN(id) || id < 1)
+                return res.status(404).send({ error: "Invalid id" });
+
+            r.deleteSlotById(id);
+
+            return res.status(200).send({ message: "Slot Deleted" });
+        },
+    );
 
     ///////////////////////////////////////////////////////////////////////////
 
-    // http POST 127.0.0.1:1234/spans start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z
+    // http POST 127.0.0.1:1234/spans start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
     web_server.post<{ Body: sp.InputSpan }>(
         "/spans",
         { schema: { body: sp.ZInputSpan } },
         async (req, res) => {
             let data = r.addSpan(req.body);
 
-            return res.status(201).send({ data: [data], message: "Created" });
+            return res
+                .status(201)
+                .send({ data: { span: data }, message: "Created" });
         },
     );
 
@@ -156,21 +205,60 @@ export function start_web_server() {
         async (req, res) => {
             let id: number = parseInt(req.params.id);
 
-            // if (isNaN(id) || id < 1 || id > r.spans.length)
             if (isNaN(id) || id < 1)
                 return res.status(404).send({ error: "Invalid id" });
 
-            return res
-                .status(200)
-                .send({ data: [r.getSpanById(id)], message: " Span Found" });
+            return res.status(200).send({
+                data: { span: r.getSpanById(id) },
+                message: "Span Found",
+            });
         },
     );
 
-    // web_server.get<{}>("/spans/list", {}, async (req, re) => {});
+    // http GET 127.0.0.1:1234/spans
+    web_server.get("/spans", async (req, res) => {
+        return res
+            .status(201)
+            .send({ data: { spans: r.spans }, message: "success" });
+    });
 
-    // web_server.post<{}>("/spans/edit/:id", {}, async (req, re) => {});
+    // http POST 127.0.0.1:1234/spans/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
+    web_server.post<{ Params: { id: string }; Body: sp.InputSpan }>(
+        "/spans/:id",
+        {
+            schema: {
+                params: z.object({ id: z.string() }),
+                body: sp.ZInputSpan,
+            },
+        },
+        async (req, res) => {
+            let id: number = parseInt(req.params.id);
 
-    // web_server.post<{}>("/spans/delete/:id", {}, async (req, re) => {});
+            if (isNaN(id) || id < 1)
+                return res.status(404).send({ error: "Invalid id" });
+
+            r.updateSpanById(id, req.body);
+
+            return res.status(201).send({
+                data: { span: r.getSpanById(id) },
+                message: "Updated",
+            });
+        },
+    );
+
+    web_server.delete<{ Params: { id: string } }>(
+        "/spans/:id",
+        async (req, res) => {
+            let id: number = parseInt(req.params.id);
+
+            if (isNaN(id) || id < 1)
+                return res.status(404).send({ error: "Invalid id" });
+
+            r.deleteSpanById(id);
+
+            return res.status(200).send({ message: "Span delete" });
+        },
+    );
 
     web_server.listen({ port: 1234, host: "0.0.0.0" }, (err, address) => {
         if (err) {

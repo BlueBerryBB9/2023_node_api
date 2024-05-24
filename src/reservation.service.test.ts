@@ -569,13 +569,19 @@ describe("reservationService module", () => {
         );
     });
 
-    test("updateSlotById Prohibited idSpan change", () => {
+    test("updateSlotById idSpan change", () => {
         let r = new ReservationService();
         let sp: sp.InputSpan = {
             start: new Date(2024, 3, 18, 12, 0),
             end: new Date(2024, 3, 18, 12, 30),
             desc: "prog c",
             title: "c",
+        };
+        let sp2: sp.InputSpan = {
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 30),
+            desc: "prog c++",
+            title: "c++",
         };
         let sl: sl.InputSlot = {
             start: new Date(2024, 3, 18, 12, 0),
@@ -584,16 +590,15 @@ describe("reservationService module", () => {
             user: "martin.leroy",
         };
         let sl2: sl.InputSlot = {
-            start: new Date(2024, 3, 18, 12, 15),
-            end: new Date(2024, 3, 18, 12, 30),
+            start: new Date(2024, 3, 18, 12, 0),
+            end: new Date(2024, 3, 18, 12, 15),
             idSpan: 2,
-            user: "noah.chantin",
+            user: "martin.leroy",
         };
         r.addSpan(sp);
+        r.addSpan(sp2);
         r.addSlot(sl);
-        expect(() => r.updateSlotById(1, sl2)).toThrow(
-            Error("Slot : ProhibitedIdSpanChange"),
-        );
+        r.updateSlotById(1, sl2);
     });
 
     test("makeSlotsFromSpanId span NOT found", () => {

@@ -28,7 +28,7 @@ export interface IReservationService {
         space?: number;
         pause_rate?: number;
         pause_time?: number;
-    }): void;
+    }): number;
     addUserToSlotById(login: string, slotId: number): void;
 }
 
@@ -44,7 +44,7 @@ export class ReservationService implements IReservationService {
         space?: number;
         pause_rate?: number;
         pause_time?: number;
-    }): void {
+    }): number {
         let mod = 0;
         let idSpan: number = 0;
         let new_date: Date = new Date(prms.date);
@@ -72,6 +72,7 @@ export class ReservationService implements IReservationService {
             if (i % prms.pause_rate === 0) mod = prms.pause_time;
             else mod = prms.space;
         }
+        return idSpan;
     }
 
     addUserToSlotById(login: string, slotId: number): void {

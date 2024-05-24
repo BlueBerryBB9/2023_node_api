@@ -1,17 +1,19 @@
-// import * as reserv from "../reservation.service.js";
-// import z from "zod";
+import * as reserv from "../reservation.service.js";
+import * as sl from "./slot.js";
+import * as sp from "./span.js";
+import z from "zod";
 
-// export const ZSlot = z.object({
-//     id: z.number(),
-//     start: z.coerce.date(),
-//     end: z.coerce.date(),
-//     user: z.string().optional(),
-//     idSpan: z.number(),
-// });
+export const ZParams = z.object({
+    span: sp.ZInputSpan.or(z.number()),
+    date: z.coerce.date(),
+    inc: z.number(),
+    slot_nb: z.number(),
+    space: z.number().optional(),
+    pause_rate: z.number().optional(),
+    pause_time: z.number().optional(),
+});
 
-// export const ZPartialSlot = ZSlot.partial(); // tous les champs sont devenus optionels
-// export const ZInputSlot = ZSlot.omit({ id: true }); // le même objet sans l'id
+export const ZPartialParams = ZParams.partial(); // tous les champs sont devenus optionels
 
-// export type Slot = z.infer<typeof ZSlot>; // Le type typescript qui correspond à l'objet
-// export type PartialSlot = z.infer<typeof ZPartialSlot>; // Le type typescript avec toutes les props optionelles
-// export type InputSlot = z.infer<typeof ZInputSlot>; // Le type typescript sans l'id
+export type Params = z.infer<typeof ZParams>; // Le type typescript qui correspond à l'objet
+export type PartialParams = z.infer<typeof ZPartialParams>; // Le type typescript avec toutes les props optionelles

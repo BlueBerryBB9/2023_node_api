@@ -9,6 +9,7 @@ import { z } from "zod";
 import * as reserv from "./reservation.service.js";
 import * as sp from "./models/span.js";
 import * as sl from "./models/slot.js";
+import * as pa from "./models/params.js";
 
 export function start_web_server() {
     let web_server = Fastify({
@@ -147,7 +148,7 @@ export function start_web_server() {
     });
 
     // http POST 127.0.0.1:1234/slots/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
-    web_server.post<{ Params: { id: string }; Body: sl.InputSlot }>(
+    web_server.put<{ Params: { id: string }; Body: sl.InputSlot }>(
         "/slots/:id",
         {
             schema: {
@@ -226,7 +227,7 @@ export function start_web_server() {
     });
 
     // http POST 127.0.0.1:1234/spans/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
-    web_server.post<{ Params: { id: string }; Body: sp.InputSpan }>(
+    web_server.put<{ Params: { id: string }; Body: sp.InputSpan }>(
         "/spans/:id",
         {
             schema: {
@@ -260,55 +261,23 @@ export function start_web_server() {
 
             r.deleteSpanById(id);
 
-            return res.status(200).send({ message: "Span delete" });
+            return res.status(200).send({ message: "Span deleted" });
         },
     );
 
-    // web_server.post<{ Params: { id: string }; Body: string }>(
-    //     "/slots/:id",
-    //     {
-    //         schema: {
-    //             params: z.object({ id: z.string() }),
-    //             body: z.string(),
-    //         },
-    //     },
-    //     async (req, res) => {
-    //         let id: number = parseInt(req.params.id);
+    // http POST 127.0.0.1:1234/spans/gen_slots date=2024-05-23T19:00:00.000Z inc:=15 slot_nb:=2 span:='{"start": "2024-05-23T19:00:00.000Z", "end": "2024-05-23T19:45:00.000Z", "desc": "C", "title": "CCC"}'
+    web_server.post<{ Body: pa.Params }>(
+        "/spans/gen_slots",
+        { schema: { body: pa.ZParams } },
+        async (req, res) => {
+            let id = r.makeSlotsFromSpanId(req.body);
 
-    //         if (isNaN(id) || id < 1)
-    //             return res.status(404).send({ error: "Invalid id" });
-
-    //         r.updateSpanById(id, req.body);
-
-    //         return res.status(201).send({
-    //             data: { span: r.getSpanById(id) },
-    //             message: "Updated",
-    //         });
-    //     },
-    // );
-
-    // web_server.post<{ Params: { id: string }; Body:  }>(
-    //     "/spans/:id",
-    //     {
-    //         schema: {
-    //             params: z.object({ id: z.string() }),
-    //             body: sp.ZInputSpan,
-    //         },
-    //     },
-    //     async (req, res) => {
-    //         let id: number = parseInt(req.params.id);
-
-    //         if (isNaN(id) || id < 1)
-    //             return res.status(404).send({ error: "Invalid id" });
-
-    //         r.updateSpanById(id, req.body);
-
-    //         return res.status(201).send({
-    //             data: { span: r.getSpanById(id) },
-    //             message: "Updated",
-    //         });
-    //     },
-    // );
+            return res.status(201).send({
+                data: { span: r.getSpanById(id) },
+                message: "Slots Generated",
+            });
+        },
+    );
 
     web_server.listen({ port: 1234, host: "0.0.0.0" }, (err, address) => {
         if (err) {

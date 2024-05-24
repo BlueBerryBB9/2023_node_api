@@ -9,17 +9,6 @@ export function users_add(x: User[], login: string, yob: number, name: string) {
     x.push({ id: x.length, login, yob, name });
 }
 
-// export function users_get(x: User[], index: string | number) {
-//     return x.find(
-//         (elem) => elem[typeof index === "string" ? "login" : "id"] === index,
-//     )
-//         ? x.find(
-//               (elem) =>
-//                   elem[typeof index === "string" ? "login" : "id"] === index,
-//           )
-//         : null;
-// }
-
 export function users_get(
     users: User[],
     index: { login: string } | { id: number },

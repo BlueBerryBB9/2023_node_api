@@ -85,9 +85,10 @@ export function start_web_server() {
 
     // http GET 127.0.0.1:1234/operations
     web_server.get("/operations", async (req, res) => {
-        return res
-            .status(201)
-            .send({ data: { operations: operations }, message: "success" });
+        return res.status(201).send({
+            data: { operations: operations },
+            message: "Operations Found",
+        });
     });
 
     // http GET 127.0.0.1:1234/operations/ID
@@ -100,6 +101,10 @@ export function start_web_server() {
             if (isNaN(id) || id < 1)
                 return res.status(404).send({ error: "Invalid id" });
 
+            if (id > operations.length) {
+                return res.status(404).send({ error: "Operation Not found" });
+            }
+
             return res.status(200).send({
                 data: { operations: operations[id - 1] },
                 message: "Operation Found",
@@ -108,7 +113,7 @@ export function start_web_server() {
     );
 
     ///////////////////////////////////////////////////////////////////////////
-    // SLOTS OPERATIONS
+    // SLOTS
 
     // http POST 127.0.0.1:1234/slots start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
     web_server.post<{ Body: sl.InputSlot }>(
@@ -119,7 +124,7 @@ export function start_web_server() {
 
             return res
                 .status(201)
-                .send({ data: { slot: data }, message: "Created" });
+                .send({ data: { slot: data }, message: "Slot Created" });
         },
     );
 
@@ -144,7 +149,7 @@ export function start_web_server() {
     web_server.get("/slots", async (req, res) => {
         return res
             .status(201)
-            .send({ data: { slots: r.slots }, message: "success" });
+            .send({ data: { slots: r.slots }, message: "Slots Found" });
     });
 
     // http POST 127.0.0.1:1234/slots/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z idSpan:=1
@@ -166,7 +171,7 @@ export function start_web_server() {
 
             return res.status(201).send({
                 data: { slot: r.getSlotById(id) },
-                message: "Updated",
+                message: "Slot Updated",
             });
         },
     );
@@ -187,7 +192,7 @@ export function start_web_server() {
     );
 
     ///////////////////////////////////////////////////////////////////////////
-    // SPANS OPERATIONS
+    // SPANS
 
     // http POST 127.0.0.1:1234/spans start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
     web_server.post<{ Body: sp.InputSpan }>(
@@ -198,7 +203,7 @@ export function start_web_server() {
 
             return res
                 .status(201)
-                .send({ data: { span: data }, message: "Created" });
+                .send({ data: { span: data }, message: "Span Created" });
         },
     );
 
@@ -223,7 +228,7 @@ export function start_web_server() {
     web_server.get("/spans", async (req, res) => {
         return res
             .status(201)
-            .send({ data: { spans: r.spans }, message: "success" });
+            .send({ data: { spans: r.spans }, message: "Spans Found" });
     });
 
     // http POST 127.0.0.1:1234/spans/ID start=2024-05-23T19:00:00.000Z end=2024-05-23T19:30:00.000Z desc=C title=CC
@@ -245,7 +250,7 @@ export function start_web_server() {
 
             return res.status(201).send({
                 data: { span: r.getSpanById(id) },
-                message: "Updated",
+                message: "Span Updated",
             });
         },
     );

@@ -280,7 +280,6 @@ export class ReservationServiceErr extends Error {
             | "DatesOutofSpan"
             | "AlreadyInSpan"
             | "Busy"
-            | "ProhibitedIdSpanChange"
             | "NotEnoughSpace",
         statusCode?: number,
     ) {

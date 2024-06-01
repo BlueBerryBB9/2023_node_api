@@ -1,7 +1,7 @@
 **Pour tester chaque route et certaines erreurs :**
 
 - démarrer le serveur sur un autre terminal avec yarn exe
-- copier coller la liste d'opérations séparées par un retour à la ligne et presser entrée
+- copier coller la liste d'opérations séparées par un retour à la ligne et presser entrée pour les éxécuter successivement
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -10,4 +10,4 @@
 
 POUR LANCER LE SERVEUR : yarn nodemon
 
-POUR TESTER : insomnia ou http cli avec les commandes en commentaires au dessus des routes
+POUR TESTER : insomnia ou http cli avec les différents test dans _"server.test.md"_

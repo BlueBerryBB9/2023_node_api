@@ -7,7 +7,7 @@
   For tests : it's returning an Error with message
   In a catch : you can call custom method Error() to return an object with a message and a status Code -> more at the bottom of reservation.service.ts
 
-**current tasks :**
 
-- A DEMANDER : span.ts : ajouter au type span une liste des id de tout les slots lié;
-- BONUS à faire : créer une route pour inscrire et une autre pour générer des créneaux
+POUR LANCER LE SERVEUR : yarn nodemon
+
+POUR TESTER : insomnia ou http cli avec les commandes en commentaires au dessus des routes

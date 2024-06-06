@@ -271,18 +271,20 @@ export function start_web_server() {
     );
 
     // http POST 127.0.0.1:1234/spans/gen_slots date=2024-05-23T19:00:00.000Z inc:=15 slot_nb:=2 span:='{"start": "2024-05-23T19:00:00.000Z", "end": "2024-05-23T19:45:00.000Z", "desc": "C", "title": "CCC"}'
-    web_server.post<{ Body: pa.Params }>(
-        "/spans/gen_slots",
-        { schema: { body: pa.ZParams } },
-        async (req, res) => {
-            let id = r.makeSlotsFromSpanId(req.body);
+    //THIS IS A BONUS ROUTE --> make slots can't be use on another route so it's not REST API like but it is here
 
-            return res.status(201).send({
-                data: { span: r.getSpanById(id) },
-                message: "Slots Generated",
-            });
-        },
-    );
+    // web_server.post<{ Body: pa.Params }>(
+    //     "/spans/gen_slots",
+    //     { schema: { body: pa.ZParams } },
+    //     async (req, res) => {
+    //         let id = r.makeSlotsFromSpanId(req.body);
+
+    //         return res.status(201).send({
+    //             data: { span: r.getSpanById(id) },
+    //             message: "Slots Generated",
+    //         });
+    //     },
+    // );
 
     web_server.listen({ port: 1234, host: "0.0.0.0" }, (err, address) => {
         if (err) {

@@ -1,12 +1,12 @@
 # 2023_node_api project
 
-## General details
+## General details :
 - Used Languages : Typescript, NodeJS with fastify framework
 - Time : 8 weeks
 - Used Softwares : VScode / ArchLinux / yarn / npm
 - Teams size : 1 person
 
-## Context
+## Context :
 - During my second year at 89, the goal was to create a [API Rest](https://en.wikipedia.org/wiki/REST), by creating a backend side with fastify.
 
 ## Skills : 

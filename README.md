@@ -1,13 +1,20 @@
-# 2023_node_api
+# 2023_node_api project
 
-**recent changes :**
+## General details
+- Used Languages : Typescript, NodeJS with fastify framework
+- Time : 8 weeks
+- Used Softwares : VScode / ArchLinux / yarn / npm
+- Teams size : 1 person
 
-- TD3 et TD4 fini ! (en théorie)
-- Custom Error class usage have been changed --> its now extending Error,
-  For tests : it's returning an Error with message
-  In a catch : you can call custom method Error() to return an object with a message and a status Code -> more at the bottom of reservation.service.ts
-- Une Route a été ajoutée pour générer des slots : spans/gen_slots dans server.ts
+## Context
+- During my second year at 89, the goal was to create a [API Rest](https://en.wikipedia.org/wiki/REST), by creating a backend side with fastify.
 
-POUR LANCER LE SERVEUR : yarn nodemon
+## Skills : 
+- Use a nodeJS framework.
+- Build a node project with yarn and npm.
+- Learn how an API rest works and why is it a API "Rest".
+- Use HTTP requests and tokens.
 
-POUR TESTER : insomnia ou http cli avec les différents test dans _"server.test.md"_
+## Feelings on the project :
+- Very interesting to learn Typescript.
+- Easy to understand since we already used Symfony PHP framework as API.

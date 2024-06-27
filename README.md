@@ -7,7 +7,7 @@
 - Teams size : 3 person -> with [Nchanti33](https://github.com/Nchanti33/Nchanti33) and [TheDrownedZodiac](https://github.com/TheDrownedZodiac)
 
 ## Context :
-- During my second year at 89, the goal was to create a [API Rest](https://en.wikipedia.org/wiki/REST), by creating a backend side with fastify.
+- During my second year at 89, the goal was to create a [API Rest](https://en.wikipedia.org/wiki/REST), by creating a backend with fastify.
 
 ## Skills : 
 - Use a nodeJS framework.
